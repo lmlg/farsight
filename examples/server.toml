@@ -1,0 +1,8 @@
+[server]
+address = '0.0.0.0'
+port = 65000
+max_errors = 10
+
+[rbd]
+ceph_conf = '/srv/ceph.conf'
+ceph_user = 'client.farsight'

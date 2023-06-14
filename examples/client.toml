@@ -1,0 +1,12 @@
+[nbd]
+file = "/dev/nbd0"
+blocksize = 1024
+
+[server]
+address = "10.5.3.205"
+port = 65000
+
+[backend]
+name = "rbd"
+pool = "rbd"
+image = "img"
