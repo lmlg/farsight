@@ -52,6 +52,7 @@ setup(
     author='Canonical Storage Team',
     license='Apache-2.0: http://www.apache.org/licenses/LICENSE-2.0',
     packages=find_packages(exclude=['unit_tests']),
+    cmdclass={'test': Tox},
     install_requires=install_requires,
     extras_require={'testing': test_requires},
     tests_require=test_requires,
