@@ -8,9 +8,9 @@ import struct
 import sys
 import toml
 
-import nbd
+from . import nbd
 
-from handlers import get_handler_class
+from .handlers import get_handler_class
 
 
 class Client(object):

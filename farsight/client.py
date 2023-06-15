@@ -6,7 +6,7 @@ import socket
 import sys
 import toml
 
-import nbd
+from . import nbd
 
 
 def make_client_socket(addr, port):

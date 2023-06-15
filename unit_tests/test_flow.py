@@ -7,8 +7,8 @@ import tempfile
 import unittest
 from unittest.mock import patch, ANY
 
-import client
-import server
+import farsight.client as client
+import farsight.server as server
 
 
 class MockHandler:
