@@ -58,6 +58,22 @@ By themselves, the client and server don't do much unless they agree on a
 backend to use. At the time of this writing, farsight only supports the
 "rbd" backend, which needs to be configured by both the client and server.
 
+### rbd dependencies
+In order to use the RBD backend, the server must have the necessary libraries
+included. They can be installed by the system's package manager. For example,
+on Ubuntu, you may run something like this:
+
+```shell
+apt install python3-rados python3-rbd
+```
+
+For more information, see here:
+<https://docs.ceph.com/en/latest/rados/api/python/>
+<https://docs.ceph.com/en/latest/rbd/api/librbdpy/>
+
+Note that if those libraries aren't present, the server won't be able to
+use the RBD backend, but it will still be able to boot up and run.
+
 ### rbd client configuration
 When using this backend, the client must set the "name" key to "rbd". In
 addition, it must set the "pool" and "image" keys to specify which image
