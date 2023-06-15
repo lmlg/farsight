@@ -4,5 +4,5 @@ port = 65000
 max_errors = 10
 
 [rbd]
-ceph_conf = '/srv/ceph.conf'
+ceph_conf = './ceph.conf'
 ceph_user = 'client.farsight'
