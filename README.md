@@ -3,7 +3,7 @@
 farsight is a client/server application that allows users to implement block devices
 without the need for kernel modules by extending a very simple interface.
 
-# usage
+# installation
 
 As with most python packages, it suffices to call the setup script:
 
@@ -89,3 +89,22 @@ must be set to specify the username to use when accessing the cluster.
 ## Example files
 In the "examples" directory there are 2 files corresponding to the client and
 server configuration to support an RBD-backed block device.
+
+# usage
+After installing and configuring the application, we can use the client and
+server:
+
+```shell
+python3 -m farsight.client <path_to_config_file>
+python3 -m farsight.server <path_to_config_file>
+```
+
+Assuming everything goes well, both applications will block indefinitely
+when running: the client to back a block device with the configured backend
+and the server to handle incoming clients. They both can be interrupted by
+signals to stop their execution.
+
+The client will most likely need root permissions, as it needs to open
+and manage an NBD block device. Once the client has been connected, the
+corresponding device can be opened for read/write, and its contents will
+be backed as specified by the backend.
