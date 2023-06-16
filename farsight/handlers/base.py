@@ -1,11 +1,7 @@
 import os
 import errno
 import struct
-import sys
 
-sys.path.append('..')
-
-#from .. import nbd
 import nbd
 
 
