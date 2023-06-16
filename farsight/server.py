@@ -122,7 +122,7 @@ def handle_client(sock, server):
             buf = sock.recv(size)
             if len(buf) != size:
                 server.logger.error(
-                    'invalid size or truncated message (got %d instead of %d)' %
+                    'invalid size for message (got %d instead of %d)' %
                     (len(buf), size))
                 server.client_error(client)
             else:

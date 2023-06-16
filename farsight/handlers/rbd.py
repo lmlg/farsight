@@ -50,7 +50,7 @@ class RBDHandler(base.HandlerBase):
                 else:
                     err = errno.EIO
                 self.logger.error('RBD: failed to read: (%s: %s)' %
-                                   self._error_tuple(err))
+                                  self._error_tuple(err))
                 self.reply(client, cookie, err)
             else:
                 # Reply with the read data.

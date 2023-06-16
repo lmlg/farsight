@@ -1,4 +1,3 @@
-import errno
 import fcntl
 import ipaddress
 import json
@@ -65,7 +64,7 @@ def main():
         # This is where we block. This ioctl makes the calling process
         # serve NBD requests until interrupted or killed.
         fcntl.ioctl(fd, nbd.NBD_DO_IT)
-    except:
+    except BaseException:
         pass
 
     fcntl.ioctl(fd, nbd.NBD_DISCONNECT)

@@ -5,7 +5,7 @@ import sys
 import tempfile
 
 import unittest
-from unittest.mock import patch, ANY
+from unittest.mock import patch
 
 import farsight.client as client
 import farsight.server as server
