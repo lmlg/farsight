@@ -69,6 +69,8 @@ def make_handler(server, config):
     handler_cls = get_handler_class(name)
     if not handler_cls:
         raise KeyError('no handler found for %s backend' % name)
+    elif isinstance(handler_cls, Exception):
+        raise handler_cls
     return handler_cls(config, server)
 
 
@@ -82,18 +84,17 @@ def handle_client(sock, server):
             data = json.loads(sock.recv(1024).decode('utf-8'))
             logger.info('client handshake: "%s"' % data)
             handler = make_handler(server, data)
+
+            # Inform the client of the backing store size.
+            response = {'error': None,
+                        'blocks': handler.get_blocks(data['blocksize'])}
+            server.add_client(Client(handler, sock))
+            sock.sendall(json.dumps(response).encode('utf-8'))
         except Exception as exc:
             logger.exception(exc)
             response = {'error': str(exc)}
-            sock.send(json.dumps(response).encode('utf-8'))
+            sock.sendall(json.dumps(response).encode('utf-8'))
             server.del_socket(sock)
-            return
-
-        server.add_client(Client(handler, sock))
-        # Inform the client of the backing store size.
-        response = {'error': None,
-                    'blocks': handler.get_blocks(data['blocksize'])}
-        sock.send(json.dumps(response).encode('utf-8'))
     else:
         # Operational phase.
         header = sock.recv(nbd.NBD_HEADER_SIZE)
@@ -156,7 +157,8 @@ def main():
     server_conf = config['server']
     sock = make_server_socket(server_conf['address'], server_conf['port'])
 
-    logging.basicConfig(level=logging.NOTSET)
+    log_level = server_conf.get('log_level', logging.NOTSET)
+    logging.basicConfig(level=log_level)
     logger = logging.getLogger('farsight-server')
     loop = asyncio.new_event_loop()
     server = Server(loop, logger, config)
@@ -168,6 +170,7 @@ def main():
     loop.run_forever()
     logger.info('server shutting down')
     server.close()
+    sock.shutdown(socket.SHUT_RDWR)
     sock.close()
 
 
