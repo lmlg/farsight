@@ -17,7 +17,7 @@ class HandlerBase(object):
         pass
 
     def get_blocks(self, blocksize):
-        return int(math.ceil(self.size() / blocksize))
+        return int(math.ceil(self.get_size() / blocksize))
 
     def get_size(self):
         return 1
