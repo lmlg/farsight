@@ -1,8 +1,9 @@
 import os
 import errno
+import math
 import struct
 
-import nbd
+from .. import nbd
 
 
 class HandlerBase(object):
@@ -15,7 +16,10 @@ class HandlerBase(object):
     def close(self):
         pass
 
-    def get_blocks(self, _):
+    def get_blocks(self, blocksize):
+        return int(math.ceil(self.size() / blocksize))
+
+    def get_size(self):
         return 1
 
     def reply(self, client, cookie, error, data=None):
