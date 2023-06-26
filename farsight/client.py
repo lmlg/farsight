@@ -22,7 +22,8 @@ def make_nbd_fd(config, num_blocks):
     fcntl.ioctl(fd, nbd.NBD_SET_BLKSIZE, config['blocksize'])
     fcntl.ioctl(fd, nbd.NBD_SET_SIZE_BLOCKS, num_blocks)
     fcntl.ioctl(fd, nbd.NBD_SET_TIMEOUT, config.get('timeout', 10))
-    fcntl.ioctl(fd, nbd.NBD_SET_FLAGS, (1 << 0) | (1 << 2))
+    fcntl.ioctl(fd, nbd.NBD_SET_FLAGS,
+                nbd.NBD_FLAG_HAS_FLAGS | nbd.NBD_FLAG_SEND_FLUSH)
     return fd
 
 
