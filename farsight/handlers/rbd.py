@@ -29,8 +29,8 @@ class RBDHandler(base.HandlerBase):
     def _error_tuple(self, code):
         return (errno.errocode.get(code, '???'), os.strerror(code))
 
-    def get_blocks(self, blocksize):
-        return self.image.stat()['size'] // blocksize
+    def get_size(self):
+        return self.image.stat()['size']
 
     def flush(self, client, cookie):
         try:
@@ -68,7 +68,7 @@ class RBDHandler(base.HandlerBase):
             err = obj.get_return_value()
             if err < 0:
                 self.logger.error('RBD: failed to write: (%s: %s)' %
-                                  self._error_tuple(err))
+                                  self._error_tuple(-err))
             self.reply(client, cookie, 0 if err >= 0 else -err)
 
         try:
