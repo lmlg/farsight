@@ -91,7 +91,29 @@ In the "examples" directory there are 2 files corresponding to the client and
 server configuration to support an RBD-backed block device.
 
 # usage
-After installing and configuring the application, we can use the client and
+Before attempting to use the application, the client must ensure that it has
+the `nbd` module up and running. This can be done by calling:
+
+```shell
+modprobe nbd
+```
+
+Afterwards, the files `/dev/nbdX` should be visible.
+
+Furthermore, if using `udev`, the following rule should be added in
+order to prevent NBD requests from lingering indefinitely:
+
+```shell
+$ cat << EOF >> /etc/udev/rules.d/97-nbd-device.rules
+# Disable inotify watching of change events for NBD devices
+ACTION=="add|change", KERNEL=="nbd*", OPTIONS:="nowatch"
+EOF
+
+udevadm control --reload-rules
+udevadm trigger
+```
+
+With the application installed and configured, we can now use the client and
 server:
 
 ```shell
