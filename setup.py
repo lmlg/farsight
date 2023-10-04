@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
 
-install_requires = ['toml']
+install_requires = ['toml', 'flask']
 test_requires = ['tox >= 2.3.1']
 version = '0.1'
 

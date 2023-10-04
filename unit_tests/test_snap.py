@@ -2,14 +2,46 @@ import unittest
 from unittest.mock import patch
 
 import farsight.snap as snap
+import farsight.client as client
 from . import rpc_mocks
 
 
-def mock_check_output(*args):
+def mock_check_snap_output(*args):
     if args[0] == 'snap_rpc.py':
         return rpc_mocks.snap_rpc_handle(args)
     elif args[0] == 'spdk_rpc.py':
         return rpc_mocks.spdk_rpc_handle(args)
+
+
+def mock_check_nvme_output(*args):
+    if args[0] != 'nvme':
+        raise KeyError('Invalid command name')
+    elif args[1] == 'list-subsys':
+        return """
+{
+  "Subsystems" : [
+    {
+      "NQN" : "nqn.0",
+      "Paths" : [
+        {
+          "Name" : "nvme1"
+        }]}]
+}
+        """
+    elif args[1] == 'list-ns':
+        if not args[-1].startswith('/dev'):
+            raise KeyError('Invalid device name')
+        return """
+{
+  "nsid_list" : [
+    {
+      "nsid" : 2
+    },
+    {
+      "nsid" : 5
+    }]
+}
+        """
 
 
 class TestSNAP(unittest.TestCase):
@@ -19,7 +51,7 @@ class TestSNAP(unittest.TestCase):
 
     @patch.object(snap, '_check_output')
     def test_snap(self, check_output):
-        check_output.side_effect = mock_check_output
+        check_output.side_effect = mock_check_snap_output
         s = snap.SNAP({})
         self.assertEqual(s.manager, 'mlx5_0')
         self.assertEqual(len(s.controllers), 2)
@@ -39,3 +71,9 @@ class TestSNAP(unittest.TestCase):
             s.delete_rbd_dev(rv)
 
         self.assertFalse(rpc_mocks.rbd_present(rv))
+
+    @patch.object(client, '_check_output')
+    def test_client(self, check_output):
+        check_output.side_effect = mock_check_nvme_output
+        rv = client.find_device('nqn.0', 5)
+        self.assertEqual(rv, '/dev/nvme1n2')
