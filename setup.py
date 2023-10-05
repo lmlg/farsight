@@ -43,8 +43,8 @@ class Tox(TestCommand):
 class Install(InstallCommand):
     def run(self):
         super().run()
-        subprocess.call(['mkdir', '/var/lib/dpu'])
         subprocess.call(['make', '-C', 'rbdext'])
+        subprocess.call(['mkdir', '/var/lib/dpu'])
         subprocess.call(['cp', 'rbdext/libxrbd.so', '/var/lib/dpu'])
 
 
