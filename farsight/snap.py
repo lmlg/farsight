@@ -1,7 +1,9 @@
 #! /usr/bin/env python
 
+import configparser
 import json
 import logging
+import pathlib
 import random
 import string
 import subprocess
@@ -85,6 +87,9 @@ class SNAP:
         self.controllers = _list_controllers()
         self.subsystems = _list_subsystems()
         self.num_pf = config.get('num_pf', 2)
+        self.dpu_dir = pathlib.Path(config.get('dpu_dir', '/var/lib/dpu'))
+        self.service_file = config.get('service_file',
+                                       '/lib/systemd/system/mlnx_snap.service')
 
     def _get_controller(self, host):
         # XXX: For now, we assume the first controller is always valid.
@@ -104,6 +109,39 @@ class SNAP:
     def restart_service(self):
         self.stop_service()
         self.start_service()
+
+    def setup_service(self):
+        self.stop_service()
+        try:
+            parser = configparser.ConfigParser()
+            parser.optionxform = str   # Preserves case.
+            parser.read(self.service_file)
+            env_file = parser['Service']['EnvironmentFile']
+            with open(env_file, 'r+') as ef:
+                # The environment file doesn't have sections, so we
+                # need to add a dummy one.
+                parser.clear()
+                parser.read_string('[default]\n' + ef.read())
+                # Replace the SNAP and SPDK init files.
+                values = parser['default']
+                conf_file = values.get('SPDK_RPC_INIT_CONF')
+                if conf_file:
+                    _check_output('cp', conf_file, str(self.dpu_dir))
+                conf_file = values.get('SNAP_RPC_INIT_CONF')
+                if conf_file:
+                    _check_output('cp', conf_file, str(self.dpu_dir))
+
+                empty_file = self.dpu_dir / 'empty.conf'
+                _check_output('touch', str(empty_file))
+                values['SPDK_RPC_INIT_CONF'] = str(empty_file)
+                values['SNAP_RPC_INIT_CONF'] = str(empty_file)
+                values['LD_PRELOAD'] = str(self.dpu_dir / 'libxrbd.so')
+                # Replace the environment file.
+                ef.seek(0)
+                ef.write('# ')   # Skip 'default' section.
+                parser.write(ef, space_around_delimiters=False)
+        finally:
+            self.start_service()
 
     def setup_controllers(self):
         controllers = []

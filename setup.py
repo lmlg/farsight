@@ -2,6 +2,9 @@
 
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
+from setuptools.command.install import install as InstallCommand
+
+import subprocess
 
 
 install_requires = ['toml', 'flask']
@@ -37,6 +40,14 @@ class Tox(TestCommand):
         sys.exit(errno)
 
 
+class Install(InstallCommand):
+    def run(self):
+        super().run()
+        subprocess.call(['mkdir', '/var/lib/dpu'])
+        subprocess.call(['make', '-C', 'rbdext'])
+        subprocess.call(['cp', 'rbdext/libxrbd.so', '/var/lib/dpu'])
+
+
 setup(
     name='farsight',
     version=version,
@@ -52,7 +63,7 @@ setup(
     author='Canonical Storage Team',
     license='Apache-2.0: http://www.apache.org/licenses/LICENSE-2.0',
     packages=find_packages(exclude=['unit_tests']),
-    cmdclass={'test': Tox},
+    cmdclass={'test': Tox, 'install': Install},
     install_requires=install_requires,
     extras_require={'testing': test_requires},
     tests_require=test_requires,
