@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 from flask import Flask, request, jsonify
-from snap import SNAP
+from .snap import SNAP
 import sys
 import toml
 
@@ -43,7 +43,7 @@ def attach_delete():
         return jsonify({'error': str(exc)})
 
 
-if __name__ == '__main__':
+def main():
     global snap
     if len(sys.argv) != 2:
         print('usage: server toml-config-file-path')
@@ -56,3 +56,7 @@ if __name__ == '__main__':
     server_conf = config['server']
     app.run(host=server_conf.get('host', '0.0.0.0'),
             port=server_conf.get('port', 7979))
+
+
+if __name__ == '__main__':
+    main()
